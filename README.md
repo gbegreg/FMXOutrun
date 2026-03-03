@@ -1,10 +1,10 @@
 # FMXOutrun
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-![Top language](https://img.shields.io/github/languages/top/gbegreg/FunMaze)
-[![](https://tokei.rs/b1/github/gbegreg/MapReduce?category=code)](https://github.com//gbegreg/FunMaze)
-[![](https://tokei.rs/b1/github/gbegreg/MapReduce?category=files)](https://github.com//gbegreg/FunMaze)
-![GitHub last commit](https://img.shields.io/github/last-commit/gbegreg/FunMaze)
+![Top language](https://img.shields.io/github/languages/top/gbegreg/FMXOutrun)
+[![](https://tokei.rs/b1/github/gbegreg/FMXOutrun?category=code)](https://github.com//gbegreg/FMXOutrun)
+[![](https://tokei.rs/b1/github/gbegreg/FMXOutrun?category=files)](https://github.com//gbegreg/FMXOutrun)
+![GitHub last commit](https://img.shields.io/github/last-commit/gbegreg/FMXOutrun)
 
 A 2D race car like Outrun with Delphi  <br /><br />
 
