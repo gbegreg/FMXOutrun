@@ -12,3 +12,7 @@ This project is linked to an article that will be published in Programmez! magaz
 It allows you to create a 2D racing video game in the style of Outrun or Lotus Turbo Challenge. <br /><br />
 
 The graphics are taken from the games Outrun (arcade), Super Hang-On (Sega Mega Drive), and Lotus Turbo Challenge (Sega Mega Drive) on the website : https://www.spriters-resource.com/
+
+[![FMXOutrun](https://github.com/gbegreg/FMXOutrun/blob/main/capture.png)]([https://youtu.be/1MBjJuxV3wM?si=7mU11MSj5OhxCAoQ](https://youtu.be/sQxK5Ese7rM?si=PodCM3po_DgDDcWr))
+
+(click the image to see the Youtube video)
