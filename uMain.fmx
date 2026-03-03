@@ -1,0 +1,185 @@
+object fMain: TfMain
+  Left = 0
+  Top = 0
+  Caption = 'FMXOutrun Delphi'
+  ClientHeight = 600
+  ClientWidth = 800
+  Position = ScreenCenter
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object PaintBox: TPaintBox
+    Align = Client
+    HitTest = False
+    Size.Width = 800.000000000000000000
+    Size.Height = 600.000000000000000000
+    Size.PlatformDefault = False
+    ParentShowHint = False
+    ShowHint = False
+    OnPaint = PaintBoxPaint
+    object imgPlayer: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = 176.000000000000000000
+      Position.Y = 168.000000000000000000
+      Size.Width = 231.000000000000000000
+      Size.Height = 123.000000000000000000
+      Size.PlatformDefault = False
+      object aniOffRoad: TFloatAnimation
+        AutoReverse = True
+        Duration = 0.050000000745058060
+        Loop = True
+        PropertyName = 'Position.Y'
+        StartValue = 0.000000000000000000
+        StopValue = 0.000000000000000000
+      end
+    end
+    object layHUD: TLayout
+      Align = Bottom
+      Position.Y = 568.000000000000000000
+      Size.Width = 800.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lblSpeed: TLabel
+        Align = Right
+        StyledSettings = [Family]
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Position.X = 670.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.StyleExt = {00090000000100000004000000}
+        TextSettings.FontColor = claBrown
+        TextSettings.HorzAlign = Trailing
+        TabOrder = 0
+      end
+    end
+    object layOptions: TLayout
+      Align = Top
+      Size.Width = 800.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object recOptions: TRectangle
+        Align = Client
+        Opacity = 0.800000011920929000
+        Margins.Left = 20.000000000000000000
+        Margins.Top = 10.000000000000000000
+        Margins.Right = 20.000000000000000000
+        Size.Width = 760.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        XRadius = 5.000000000000000000
+        YRadius = 5.000000000000000000
+        object chkShowLines: TCheckBox
+          Align = Left
+          IsChecked = True
+          Margins.Left = 5.000000000000000000
+          Position.X = 5.000000000000000000
+          Size.Width = 84.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Show lines'
+          OnChange = chkShowLinesChange
+        end
+        object chkShowOpponents: TCheckBox
+          Align = Left
+          IsChecked = True
+          Position.X = 186.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 6
+          Text = 'Show opponents'
+          OnChange = chkShowOpponentsChange
+        end
+        object chkShowRumbles: TCheckBox
+          Align = Left
+          IsChecked = True
+          Position.X = 306.000000000000000000
+          Size.Width = 106.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          Text = 'Show rumbles'
+          OnChange = chkShowRumblesChange
+        end
+        object chkShowSprites: TCheckBox
+          Align = Left
+          IsChecked = True
+          Position.X = 89.000000000000000000
+          Size.Width = 97.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
+          Text = 'Show sprites'
+          OnChange = chkShowSpritesChange
+        end
+        object chkShowLane: TCheckBox
+          Align = Left
+          IsChecked = True
+          Position.X = 412.000000000000000000
+          Size.Width = 85.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          Text = 'Show lane'
+          OnChange = chkShowLaneChange
+        end
+        object tbDrawDistance: TTrackBar
+          Align = Client
+          CanFocus = False
+          CanParentFocus = True
+          Max = 500.000000000000000000
+          Min = 5.000000000000000000
+          Orientation = Horizontal
+          Margins.Right = 10.000000000000000000
+          Size.Width = 91.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 7
+          Value = 150.000000000000000000
+          OnChange = tbDrawDistanceChange
+        end
+        object lblDrawDistance: TLabel
+          Align = Left
+          Position.X = 579.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Draw distance'
+          TabOrder = 8
+        end
+        object chkRoadside: TCheckBox
+          Align = Left
+          ClipChildren = True
+          IsChecked = True
+          Position.X = 497.000000000000000000
+          Size.Width = 82.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Text = 'Roadsides'
+          OnChange = chkRoadsideChange
+        end
+      end
+    end
+  end
+  object tGameloop: TTimer
+    Interval = 16
+    OnTimer = tGameloopTimer
+    Left = 32
+    Top = 88
+  end
+end
