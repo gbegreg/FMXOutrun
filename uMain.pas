@@ -811,7 +811,7 @@ begin
       SegmentClipY[N] := MaxY;
 
       if (I div FRumbleLength) mod 2 = 0 then begin
-        Grass := $FF16AB3F;
+        Grass := COLORS[7];
         Rumble := COLORS[2];
         Rumble2 := COLORS[4];
         Road := COLORS[0];
@@ -819,7 +819,7 @@ begin
         lines := COLORS[3];
         Roadside := COLORS[6];
       end else begin
-        Grass := $FF009A00;
+        Grass := COLORS[8];
         Rumble := COLORS[3];
         Rumble2 := COLORS[5];
         Road := COLORS[1];
@@ -953,6 +953,10 @@ begin
       aniOffRoad.StartValue := imgPlayer.Position.Y;
       aniOffRoad.StopValue := imgPlayer.Position.Y-7;
       aniOffRoad.start;
+    end;
+    if FSpeed = 0 then begin
+      aniOffRoad.stop;
+      imgPlayer.Position.Y := FHeight - imgPlayer.Height - 30;
     end;
   end else begin
     aniOffRoad.stop;

@@ -45,14 +45,16 @@ type
   procedure Project(var Segment: TRoadSegment; CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth: Single);
 
 const
-  COLORS: array[0..6] of TAlphaColor = (
+  COLORS: array[0..8] of TAlphaColor = (
     $FF6B6B6B,  // Route foncée
     $FF808080,  // Route claire
     $FFFF0000,  // Bord rouge
     $FFFFFFFF,  // Bord blanc
     $FFAA0000,  // Bord rouge foncé
     $FFBBBBBB,  // Bord blanc foncé
-    $55BBEE88   // Fossé
+    $55BBEE88,  // Fossé
+    $FF16AB3F,  // Herbe claire
+    $FF009A00   // Herbe foncée
   );
 
 implementation
