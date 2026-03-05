@@ -43,6 +43,8 @@ type
   procedure SortOpponentCars(var Cars: TArray<TOpponentCar>);
   procedure drawSprite(Canvas: TCanvas; DestRect: TRectF; SpriteImage: TBitmap; ClipY, FWidth, FHeight: single);
   procedure Project(var Segment: TRoadSegment; CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth: Single);
+  procedure drawBackground(anImage: TBitmap; anOffset : integer; aCanvas: TCanvas; FWidth, FHeight : integer);
+  procedure drawScanline(aCanvas : TCanvas; FWidth, FHeight : integer);
 
 const
   COLORS: array[0..8] of TAlphaColor = (
@@ -158,6 +160,39 @@ begin
   Segment.Point.X := FWidth * 0.5 + (Segment.Scale * PosX * FWidth * 0.5);
   Segment.Point.Y := FHeight * 0.5 - (Segment.Scale * PosY * FHeight * 0.5);
   Segment.Clip := Segment.Point.Y;
+end;
+
+procedure drawBackground(anImage: TBitmap; anOffset : integer; aCanvas: TCanvas; FWidth, FHeight : integer);
+begin
+  var BgWidth := anImage.Width;
+  var BgHeight := anImage.Height;
+
+  // Normaliser l'offset
+  var NormalizedOffset := anOffset mod BgWidth;
+  if NormalizedOffset > 0 then
+    NormalizedOffset := NormalizedOffset - BgWidth;
+
+  // Calculer combien de copies on doit dessiner pour remplir l'écran
+  var StartX := NormalizedOffset;
+  var NumCopies := Ceil(FWidth / BgWidth) + 2;  // +2 pour être sûr de tout couvrir
+
+  for var i := 0 to NumCopies - 1 do begin
+    var DestX := StartX + (i * BgWidth);
+    aCanvas.DrawBitmap(anImage,
+                      RectF(0, 0, BgWidth, BgHeight),
+                      RectF(DestX, 0, DestX + BgWidth, BgHeight),
+                      1, False);
+  end;
+end;
+
+procedure drawScanline(aCanvas : TCanvas; FWidth, FHeight : integer);
+begin
+  aCanvas.Fill.Color := TAlphacolorrec.Black;
+  for var i := 0 to FHeight-1 do begin
+    if i mod 4 = 0 then begin
+      aCanvas.FillRect(RectF(0, i, FWidth, i+1), 0, 0, [], 0.5);
+    end;
+  end;
 end;
 
 end.

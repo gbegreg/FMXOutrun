@@ -5,6 +5,7 @@ object fMain: TfMain
   ClientHeight = 600
   ClientWidth = 800
   Position = ScreenCenter
+  Quality = HighQuality
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -86,55 +87,55 @@ object fMain: TfMain
           IsChecked = True
           Margins.Left = 5.000000000000000000
           Position.X = 5.000000000000000000
-          Size.Width = 84.000000000000000000
+          Size.Width = 56.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
-          Text = 'Show lines'
+          Text = 'Lines'
           OnChange = chkShowLinesChange
         end
         object chkShowOpponents: TCheckBox
           Align = Left
           IsChecked = True
-          Position.X = 186.000000000000000000
-          Size.Width = 120.000000000000000000
+          Position.X = 125.000000000000000000
+          Size.Width = 84.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 6
-          Text = 'Show opponents'
+          TabOrder = 8
+          Text = 'Opponents'
           OnChange = chkShowOpponentsChange
         end
         object chkShowRumbles: TCheckBox
           Align = Left
           IsChecked = True
-          Position.X = 306.000000000000000000
-          Size.Width = 106.000000000000000000
+          Position.X = 209.000000000000000000
+          Size.Width = 72.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 4
-          Text = 'Show rumbles'
+          TabOrder = 6
+          Text = 'Rumbles'
           OnChange = chkShowRumblesChange
         end
         object chkShowSprites: TCheckBox
           Align = Left
           IsChecked = True
-          Position.X = 89.000000000000000000
-          Size.Width = 97.000000000000000000
+          Position.X = 61.000000000000000000
+          Size.Width = 64.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 5
-          Text = 'Show sprites'
+          TabOrder = 7
+          Text = 'Sprites'
           OnChange = chkShowSpritesChange
         end
         object chkShowLane: TCheckBox
           Align = Left
           IsChecked = True
-          Position.X = 412.000000000000000000
-          Size.Width = 85.000000000000000000
+          Position.X = 281.000000000000000000
+          Size.Width = 48.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 3
-          Text = 'Show lane'
+          TabOrder = 5
+          Text = 'Lane'
           OnChange = chkShowLaneChange
         end
         object tbDrawDistance: TTrackBar
@@ -145,33 +146,56 @@ object fMain: TfMain
           Min = 5.000000000000000000
           Orientation = Horizontal
           Margins.Right = 10.000000000000000000
-          Size.Width = 91.000000000000000000
+          Size.Width = 93.000000000000000000
           Size.Height = 19.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 7
+          TabOrder = 9
           Value = 150.000000000000000000
           OnChange = tbDrawDistanceChange
         end
         object lblDrawDistance: TLabel
           Align = Left
-          Position.X = 579.000000000000000000
+          Position.X = 577.000000000000000000
           Size.Width = 80.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           Text = 'Draw distance'
-          TabOrder = 8
+          TabOrder = 10
         end
         object chkRoadside: TCheckBox
           Align = Left
           ClipChildren = True
           IsChecked = True
-          Position.X = 497.000000000000000000
+          Position.X = 329.000000000000000000
           Size.Width = 82.000000000000000000
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
-          TabOrder = 2
+          TabOrder = 4
           Text = 'Roadsides'
           OnChange = chkRoadsideChange
+        end
+        object chkBackgrounds: TCheckBox
+          Align = Left
+          ClipChildren = True
+          IsChecked = True
+          Position.X = 411.000000000000000000
+          Size.Width = 94.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          Text = 'Backgrounds'
+          OnChange = chkBackgroundsChange
+        end
+        object chkScanlines: TCheckBox
+          Align = Left
+          ClipChildren = True
+          Position.X = 505.000000000000000000
+          Size.Width = 72.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Text = 'Scanlines'
+          OnChange = chkScanlinesChange
         end
       end
     end

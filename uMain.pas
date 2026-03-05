@@ -27,6 +27,10 @@ type
     lblDrawDistance: TLabel;
     chkRoadside: TCheckBox;
     tGameloop: TTimer;
+    chkBackgrounds: TCheckBox;
+    chkScanlines: TCheckBox;
+    procedure chkScanlinesChange(Sender: TObject);
+    procedure chkBackgroundsChange(Sender: TObject);
     procedure chkRoadsideChange(Sender: TObject);
     procedure chkShowLaneChange(Sender: TObject);
     procedure chkShowLinesChange(Sender: TObject);
@@ -35,10 +39,8 @@ type
     procedure chkShowSpritesChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
-        Shift: TShiftState);
-    procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar;
-        Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure PaintBoxPaint(Sender: TObject; Canvas: TCanvas);
     procedure tbDrawDistanceChange(Sender: TObject);
@@ -46,34 +48,18 @@ type
   private
     { Déclarations privées }
     // Configuration
-    FWidth, FHeight: Integer;
-    FCameraHeight: Single;
-    FCameraDepth: Single;
-    FDrawDistance: Integer;
-    FFieldOfView: Single;
-    FRoadWidth: Single;
-    FSegmentLength: Single;
-    FRumbleLength: Integer;
+    FWidth, FHeight, FDrawDistance, FRumbleLength: Integer;
+    FCameraHeight, FCameraDepth, FFieldOfView,
+    FRoadWidth, FSegmentLength: Single;
 
     // État du jeu
-    FPosition: Single;        // Position du joueur sur la route
-    FPlayerX: Single;         // Position latérale (-1 à 1)
-    FPlayerWorldX: Single;
-    FSpeed: Single;           // Vitesse actuelle
-    FMaxSpeed: Single;
-    FAccel: Single;
-    FDecel: Single;
-    FBraking: Single;
-    FCentrifugal: Single;
+    FPosition, FPlayerX, FPlayerWorldX, FSpeed,
+    FMaxSpeed, FAccel, FDecel, FBraking, FCentrifugal: Single;
     FLastCarImage: string;
 
     // Opions d'affichage
-    FShowOpponents : boolean;
-    FShowSprites : boolean;
-    FShowRumbles : boolean;
-    FShowLines : boolean;
-    FShowLane : boolean;
-    FShowRoadside : boolean;
+    FShowOpponents, FShowSprites, FShowRumbles,
+    FShowLines, FShowLane, FShowRoadside, FShowBackgrounds, FShowScanlines : boolean;
 
     // Contrôles
     FKeyLeft, FKeyRight, FKeyUp, FKeyDown: Boolean;
@@ -85,34 +71,25 @@ type
     climb: boolean;
 
     // Sprites images
-    FTreeImage: TBitmap;
-    FTree2Image: TBitmap;
-    FRightImage: TBitmap;
-    FLeftImage: TBitmap;
-    FSign1Image: TBitmap;
-    FSign2Image: TBitmap;
-    FSign3Image: TBitmap;
-    FStartImage: TBitmap;
+    FTreeImage,FTree2Image, FRightImage, FLeftImage, FSign1Image,
+    FSign2Image, FSign3Image, FStartImage: TBitmap;
+
+    // Background
+    FBackgroundImages: TArray<TBitmap>; // Images du background
+    FBackgroundOffset: integer;  // Décalage horizontal du background1 en pixels
 
     FOpponentCars: TArray<TOpponentCar>;
     FOpponentCarImages: TArray<TBitmap>;
     procedure InitializeRoad;
     procedure AddRoad(Enter, Leave, Curve, Y: Single);
-    procedure AddSprite(N: Integer; SpriteType: TSpriteType;
-      Offset: Single);
+    procedure AddSprite(N: Integer; SpriteType: TSpriteType; Offset: Single);
     function FindSegment(Z: Single): Integer;
     procedure InitializeOpponents;
     procedure UpdateOpponents(const DeltaTime: Single);
-    procedure RenderOpponent(Canvas: TCanvas; const Opponent: TOpponentCar;
-      CamX, CamY, CamZ: Single;
-      const ProjectedSegments: array of TRoadSegment; BaseSegment: Integer;
-      const SegmentClipY: array of Single);
+    procedure RenderOpponent(Canvas: TCanvas; const Opponent: TOpponentCar; CamX, CamY, CamZ: Single; const ProjectedSegments: array of TRoadSegment; BaseSegment: Integer; const SegmentClipY: array of Single);
     procedure drawHUD;
-    procedure RenderSprite(Canvas: TCanvas; const Sprite: TSprite;
-      const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
-    procedure renderSprites(const ProjectedSegments: array of TRoadSegment;
-      BaseSegment: Integer; CamX, CamY, CamZ: Single;
-      SegmentClipY: array of single);
+    procedure RenderSprite(Canvas: TCanvas; const Sprite: TSprite; const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
+    procedure renderSprites(const ProjectedSegments: array of TRoadSegment; BaseSegment: Integer; CamX, CamY, CamZ: Single; SegmentClipY: array of single);
     procedure RenderGame(Canvas: TCanvas);
     procedure UpdateGame(const DeltaTime: Single);
     procedure drawPlayerCar;
@@ -138,6 +115,8 @@ begin
   FRightImage.free;
   FLeftImage.free;
 
+  for var i := 0 to High(FBackgroundImages) do
+    FBackgroundImages[i].Free;
   for var i := 0 to High(FOpponentCarImages) do
     FOpponentCarImages[i].Free;
 end;
@@ -150,6 +129,8 @@ begin
   FShowLines := true;
   FShowLane := true;
   FShowRoadside := true;
+  FShowBackgrounds := true;
+  FShowScanlines := false;
   var aGradient := TGradient.Create;
   aGradient.Color := TAlphaColorrec.Darkturquoise;
   aGradient.Color1 := TAlphaColorrec.Aqua;
@@ -221,6 +202,15 @@ begin
   loadImage(FOpponentCarImages[1], 'opponentcar2');
   loadImage(FOpponentCarImages[2], 'opponentcar3');
 
+  SetLength(FBackgroundImages, 3);  // 3 niveaux de background
+
+  FBackgroundImages[0] := TBitmap.Create;
+  FBackgroundImages[1] := TBitmap.Create;
+  FBackgroundImages[2] := TBitmap.Create;
+
+  loadImage(FBackgroundImages[0], 'background1');
+  loadImage(FBackgroundImages[1], 'background2');
+  loadImage(FBackgroundImages[2], 'background3');
   InitializeRoad;
   FPlayerWorldX := FRoadSegments[0].World.X;
 
@@ -395,6 +385,16 @@ begin
   FSprites[Idx].SegmentIndex := N;
   FSprites[Idx].Offset := Offset;
   FSprites[Idx].SpriteType := SpriteType;
+end;
+
+procedure TfMain.chkScanlinesChange(Sender: TObject);
+begin
+  FShowScanlines := chkScanlines.IsChecked;
+end;
+
+procedure TfMain.chkBackgroundsChange(Sender: TObject);
+begin
+  FShowBackgrounds := chkBackgrounds.IsChecked;
 end;
 
 procedure TfMain.chkRoadsideChange(Sender: TObject);
@@ -602,8 +602,7 @@ begin
   lblSpeed.text := Format('%d km/h', [SpeedPercent]);
 end;
 
-procedure TfMain.FormKeyDown(Sender: TObject; var Key: Word; var KeyChar:
-    WideChar; Shift: TShiftState);
+procedure TfMain.FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 begin
   case Key of
     vkLeft: FKeyLeft := True;
@@ -613,8 +612,7 @@ begin
   end;
 end;
 
-procedure TfMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar:
-    WideChar; Shift: TShiftState);
+procedure TfMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
 begin
   case Key of
     vkLeft: FKeyLeft := False;
@@ -640,6 +638,7 @@ procedure TfMain.PaintBoxPaint(Sender: TObject; Canvas: TCanvas);
 begin
   Canvas.BeginScene;
   RenderGame(Canvas);
+  if FShowScanlines then drawScanline(canvas, FWidth, FHeight);
   Canvas.EndScene;
 end;
 
@@ -666,8 +665,7 @@ begin
   end;
 end;
 
-procedure TfMain.RenderSprite(Canvas: TCanvas; const Sprite: TSprite;
-  const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
+procedure TfMain.RenderSprite(Canvas: TCanvas; const Sprite: TSprite; const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
 begin
   var SpriteImage: TBitmap;
   var SizeMultiplier: Single;
@@ -767,13 +765,17 @@ begin
   // Horizon dynamique selon la hauteur
   var HorizonY := (FHeight * 0.5) - (InterpolatedY * 0.02);
 
-  // Fond (ciel)
-  Canvas.Fill.Color := $FF72D7EE;
-  Canvas.FillRect(RectF(0, 0, FWidth, HorizonY), 0, 0, [], 1);
-
-  // Fond (herbe/montagnes lointaines) - couleur plus sombre
-  Canvas.Fill.Color := $FF4A9A4A;
-  Canvas.FillRect(RectF(0, HorizonY, FWidth, FHeight), 0, 0, [], 1);
+  if FShowBackgrounds then begin
+    for var i := 0 to length(FBackgroundImages) -1 do
+      drawBackground(FBackgroundImages[i], FBackgroundOffset * i, canvas, FWidth, FHeight);
+  end else begin
+    // Fond (ciel)
+    Canvas.Fill.Color := $FF72D7EE;
+    Canvas.FillRect(RectF(0, 0, FWidth, HorizonY), 0, 0, [], 1);
+    // Fond (herbe/montagnes lointaines) - couleur plus sombre
+    Canvas.Fill.Color := $FF4A9A4A;
+    Canvas.FillRect(RectF(0, HorizonY, FWidth, FHeight), 0, 0, [], 1);
+  end;
 
   climb := round(NextSegment.Y - CurrentSegment.Y) > 70;
   drawPlayerCar;
@@ -943,6 +945,11 @@ begin
 
   // Effet centrifuge
   FPlayerX := FPlayerX - (DeltaTime * SpeedPercent * PlayerSegment.Curve * 16.0);
+
+  // Mettre à jour le background offset basé sur la courbure et le braquage
+  // La courbure de la route fait tourner le background
+  var BackgroundScrollSpeed := -PlayerSegment.Curve * DeltaTime * FSpeed * 0.01;
+  FBackgroundOffset := round(FBackgroundOffset + BackgroundScrollSpeed);
 
   // Détection off-road
   if (FPlayerX < -1.2) or (FPlayerX > 1.2) then begin
