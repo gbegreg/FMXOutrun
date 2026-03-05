@@ -11,7 +11,9 @@ A 2D race car like Outrun with Delphi  <br /><br />
 This project is linked to an article that will be published in Programmez! magazine in a 100% gamedev dossier.(french). <br />
 It allows you to create a 2D racing video game in the style of Outrun or Lotus Turbo Challenge. <br /><br />
 
-The graphics are taken from the games Outrun (arcade), Super Hang-On (Sega Mega Drive), and Lotus Turbo Challenge (Sega Mega Drive) on the website : https://www.spriters-resource.com/
+The graphics are taken from the games Outrun (arcade), Super Hang-On (Sega Mega Drive), and Lotus Turbo Challenge (Sega Mega Drive) on the website : https://www.spriters-resource.com/ <br />
+
+The backgrounds are from https://szadiart.itch.io/bakcground-hill
 
 [![FMXOutrun](https://github.com/gbegreg/FMXOutrun/blob/main/img/capture.png)](https://www.youtube.com/watch?v=sQxK5Ese7rM)
 
