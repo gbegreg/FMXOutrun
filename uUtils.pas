@@ -40,7 +40,6 @@ type
   function Interpolate(A, B, Percent: Single): Single;
   function InterpolationInOutCubic(T: Single): Single;
   procedure drawPolygon(aCanvas: TCanvas; aColor: Talphacolor; prevSegment, segment : TRoadSegment; aWidth, FWidth :single);
-  procedure SortOpponentCars(var Cars: TArray<TOpponentCar>);
   procedure drawSprite(Canvas: TCanvas; DestRect: TRectF; SpriteImage: TBitmap; ClipY, FWidth, FHeight: single);
   procedure Project(var Segment: TRoadSegment; CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth: Single);
   procedure drawBackground(anImage: TBitmap; anOffset : integer; aCanvas: TCanvas; FWidth, FHeight : integer);
@@ -94,28 +93,13 @@ begin
 
   var Polygon : TPolygon;
   SetLength(Polygon, 4);
-  Polygon[0] := PointF(X1, prevSegment.Point.Y);
-  Polygon[1] := PointF(X1 + W1, prevSegment.Point.Y);
-  Polygon[2] := PointF(X2 + W2, segment.Point.Y);
-  Polygon[3] := PointF(X2, segment.Point.Y);
+  Polygon[0] := PointF(X1, round(prevSegment.Point.Y));
+  Polygon[1] := PointF(X1 + W1, round(prevSegment.Point.Y));
+  Polygon[2] := PointF(X2 + W2, round(segment.Point.Y));
+  Polygon[3] := PointF(X2, round(segment.Point.Y));
 
   aCanvas.Stroke.Kind := TBrushKind.None;
   aCanvas.FillPolygon(Polygon, 1);
-end;
-
-procedure SortOpponentCars(var Cars: TArray<TOpponentCar>);
-begin
-  for var i := 1 to Length(Cars) -1 do begin
-    var Key := Cars[i];
-    var j := i - 1;
-
-    while (j >= 0) and (Cars[j].Position < Key.Position) do begin
-      Cars[j + 1] := Cars[j];
-      Dec(j);
-    end;
-
-    Cars[j + 1] := Key;
-  end;
 end;
 
 procedure drawSprite(Canvas: TCanvas; DestRect: TRectF; SpriteImage: TBitmap; ClipY, FWidth, FHeight: single);

@@ -7,7 +7,10 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
   System.Math, System.Generics.Collections, system.Math.Vectors, System.IOUtils,
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts, system.UIConsts, uUtils,
-  FMX.Ani;
+  FMX.Ani, FMX.Effects
+  {$IFDEF ANDROID}
+    , uAndroidUtils
+  {$ENDIF};
 
 type
   TfMain = class(TForm)
@@ -29,6 +32,27 @@ type
     tGameloop: TTimer;
     chkBackgrounds: TCheckBox;
     chkScanlines: TCheckBox;
+    layIHMMobile: TLayout;
+    layDPad: TLayout;
+    Layout2: TLayout;
+    btnLeft: TRectangle;
+    Image5: TImage;
+    GlowEffect2: TGlowEffect;
+    Layout4: TLayout;
+    btnRight: TRectangle;
+    Image6: TImage;
+    GlowEffect1: TGlowEffect;
+    btnAccelerate: TRectangle;
+    Image4: TImage;
+    GlowEffect4: TGlowEffect;
+    btnBrake: TRectangle;
+    Image2: TImage;
+    GlowEffect3: TGlowEffect;
+    layLine1: TLayout;
+    procedure btnAccelerateMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure btnBrakeMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure btnLeftMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure btnRightMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure chkScanlinesChange(Sender: TObject);
     procedure chkBackgroundsChange(Sender: TObject);
     procedure chkRoadsideChange(Sender: TObject);
@@ -42,6 +66,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure FormTouch(Sender: TObject; const Touches: TTouches; const Action: TTouchAction);
     procedure PaintBoxPaint(Sender: TObject; Canvas: TCanvas);
     procedure tbDrawDistanceChange(Sender: TObject);
     procedure tGameloopTimer(Sender: TObject);
@@ -78,6 +103,10 @@ type
     FBackgroundImages: TArray<TBitmap>; // Images du background
     FBackgroundOffset: integer;  // Décalage horizontal du background1 en pixels
 
+    {$IFDEF ANDROID}
+      FTouchMap: array[0..MAXTOUCHPOINTS-1] of TTouchInfo;
+    {$ENDIF}
+
     FOpponentCars: TArray<TOpponentCar>;
     FOpponentCarImages: TArray<TBitmap>;
     procedure InitializeRoad;
@@ -89,10 +118,12 @@ type
     procedure RenderOpponent(Canvas: TCanvas; const Opponent: TOpponentCar; CamX, CamY, CamZ: Single; const ProjectedSegments: array of TRoadSegment; BaseSegment: Integer; const SegmentClipY: array of Single);
     procedure drawHUD;
     procedure RenderSprite(Canvas: TCanvas; const Sprite: TSprite; const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
-    procedure renderSprites(const ProjectedSegments: array of TRoadSegment; BaseSegment: Integer; CamX, CamY, CamZ: Single; SegmentClipY: array of single);
     procedure RenderGame(Canvas: TCanvas);
     procedure UpdateGame(const DeltaTime: Single);
     procedure drawPlayerCar;
+    procedure PressButton(iTouch: TTouch);
+    procedure ReleaseButton(iTouch: TTouch);
+    function detectButtonTouched(iTouch: TTouch): integer;
   public
     { Déclarations publiques }
   end;
@@ -119,6 +150,10 @@ begin
     FBackgroundImages[i].Free;
   for var i := 0 to High(FOpponentCarImages) do
     FOpponentCarImages[i].Free;
+
+  {$IFDEF ANDROID}
+    quitAndroid;
+  {$ENDIF}
 end;
 
 procedure TfMain.FormCreate(Sender: TObject);
@@ -136,10 +171,22 @@ begin
   aGradient.Color1 := TAlphaColorrec.Aqua;
   fMain.Fill.Gradient := aGradient;
   fMain.Fill.Kind := TBrushKind.Gradient;
-  FWidth := 800;
-  FHeight := 600;
-  ClientWidth := FWidth;
-  ClientHeight := FHeight;
+  {$IFDEF ANDROID}
+    FWidth := 640;
+    FHeight := 400;
+    ClientWidth := FWidth;
+    ClientHeight := FHeight;
+    layIHMMobile.visible := true;
+    for var i := 0 to MAXTOUCHPOINTS-1 do
+       FTouchMap[i].Active := False;
+    imgPlayer.Position.X := (FWidth - imgPlayer.Width) * 0.5;
+  {$ELSE}
+    FWidth := 1024;
+    FHeight := 768;
+    ClientWidth := FWidth;
+    ClientHeight := FHeight;
+    layIHMMobile.visible := false;
+  {$ENDIF}
 
   // Configuration caméra
   FCameraHeight := 500;
@@ -387,6 +434,26 @@ begin
   FSprites[Idx].SpriteType := SpriteType;
 end;
 
+procedure TfMain.btnAccelerateMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FKeyUp := false;
+end;
+
+procedure TfMain.btnBrakeMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FKeyDown := false;
+end;
+
+procedure TfMain.btnLeftMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FkeyLeft := false;
+end;
+
+procedure TfMain.btnRightMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  FKeyRight := false;
+end;
+
 procedure TfMain.chkScanlinesChange(Sender: TObject);
 begin
   FShowScanlines := chkScanlines.IsChecked;
@@ -437,7 +504,7 @@ end;
 procedure TfMain.InitializeOpponents;
 begin
   // Créer quelques voitures adverses réparties sur la piste
-  SetLength(FOpponentCars,20);  // 20 voitures adverses
+  SetLength(FOpponentCars,  20);  // 20 voitures adverses
   randomize;
 
   for var i := 0 to High(FOpponentCars) do begin
@@ -624,14 +691,16 @@ end;
 
 procedure TfMain.FormResize(Sender: TObject);
 begin
-  FWidth := fMain.Width;
-  FHeight := fMain.height;
+  {$IFNDEF ANDROID}
+    FWidth := fMain.Width;
+    FHeight := fMain.height;
 
-  imgPlayer.width := 77 * 3 * FWidth / 800;
-  imgPlayer.height := 41 * 3 * FHeight / 600;
+    imgPlayer.width := 77 * 3 * FWidth / 800;
+    imgPlayer.height := 41 * 3 * FHeight / 600;
 
-  imgPlayer.Position.X := (FWidth - imgPlayer.Width) * 0.5;
-  imgPlayer.Position.Y := FHeight - imgPlayer.Height - 30;
+    imgPlayer.Position.X := (FWidth - imgPlayer.Width) * 0.5;
+    imgPlayer.Position.Y := FHeight - imgPlayer.Height - 30;
+  {$ENDIF}
 end;
 
 procedure TfMain.PaintBoxPaint(Sender: TObject; Canvas: TCanvas);
@@ -640,29 +709,6 @@ begin
   RenderGame(Canvas);
   if FShowScanlines then drawScanline(canvas, FWidth, FHeight);
   Canvas.EndScene;
-end;
-
-procedure TfMain.renderSprites(const ProjectedSegments : array of TRoadSegment; BaseSegment: Integer; CamX, CamY, CamZ: Single; SegmentClipY: array of single);
-begin
-  // Rendu des sprites
-  // On les dessine de l'arrière vers l'avant pour un effet de profondeur correct
-  for var N := FDrawDistance  downto 1 do begin
-    var Segment := ProjectedSegments[N];
-    var I := (BaseSegment + N) mod Length(FRoadSegments);
-
-    // Dessiner tous les sprites de ce segment
-    for var S := 0 to Length(FSprites) - 1 do begin
-      if FSprites[S].SegmentIndex = I then begin
-        if (Segment.Scale > 0) and (Segment.Point.Y < FHeight) then begin
-          var ClipY : single := FHeight;
-          if N > 0 then
-            ClipY := SegmentClipY[N];
-
-          RenderSprite(Canvas, FSprites[S], Segment, CamX, CamY, CamZ, ClipY);
-        end;
-      end;
-    end;
-  end;
 end;
 
 procedure TfMain.RenderSprite(Canvas: TCanvas; const Sprite: TSprite; const Segment: TRoadSegment; CamX, CamY, CamZ, ClipY: Single);
@@ -765,14 +811,14 @@ begin
   // Horizon dynamique selon la hauteur
   var HorizonY := (FHeight * 0.5) - (InterpolatedY * 0.02);
 
+  // Afficher les images de fond avec scrolling paralaxe
   if FShowBackgrounds then begin
     for var i := 0 to length(FBackgroundImages) -1 do
       drawBackground(FBackgroundImages[i], FBackgroundOffset * i, canvas, FWidth, FHeight);
   end else begin
-    // Fond (ciel)
+    // Sinon, simple affichage d'une couleur bleue pour le ciel et verte pour le sol
     Canvas.Fill.Color := $FF72D7EE;
     Canvas.FillRect(RectF(0, 0, FWidth, HorizonY), 0, 0, [], 1);
-    // Fond (herbe/montagnes lointaines) - couleur plus sombre
     Canvas.Fill.Color := $FF4A9A4A;
     Canvas.FillRect(RectF(0, HorizonY, FWidth, FHeight), 0, 0, [], 1);
   end;
@@ -871,15 +917,38 @@ begin
     end else SegmentClipY[N] := MaxY;
   end;
 
-  if FShowSprites then
-     renderSprites(ProjectedSegments, BaseSegment, CamX, CamY, CamZ, SegmentClipY);
+  // dessin des sprites et des voitures adverses par segment : du plus loin au plus proche
+  // ceci pour
+  for var N := FDrawDistance downto 1 do begin
+    var Segment := ProjectedSegments[N];
+    var I := (BaseSegment + N) mod Length(FRoadSegments);
 
-  // Rendu des voitures adverses
-  if FShowOpponents then begin
-    // Trier par distance pour dessiner de l'arrière vers l'avant
-    SortOpponentCars(FOpponentCars);
-    for var i := 0 to High(FOpponentCars) do
-      RenderOpponent(Canvas, FOpponentCars[i], CamX, CamY, CamZ, ProjectedSegments, BaseSegment, SegmentClipY);
+    if (Segment.Scale > 0) and (Segment.Point.Y < FHeight) then begin
+      var ClipY: Single := FHeight;
+      if N > 0 then
+        ClipY := SegmentClipY[N];
+
+      // 1. Sprites de ce segment
+      if FShowSprites then begin
+        for var S := 0 to Length(FSprites) - 1 do begin
+          if FSprites[S].SegmentIndex = I then begin
+            RenderSprite(Canvas, FSprites[S], Segment, CamX, CamY, CamZ, ClipY);
+          end;
+        end;
+      end;
+
+      // 2. Voitures de ce segment
+      if FShowOpponents then begin
+        for var OpIdx := 0 to High(FOpponentCars) do begin
+          var OpponentSegmentIndex := FindSegment(FOpponentCars[OpIdx].Position);
+
+          if OpponentSegmentIndex = I then begin
+            RenderOpponent(Canvas, FOpponentCars[OpIdx], CamX, CamY, CamZ,
+                          ProjectedSegments, BaseSegment, SegmentClipY);
+          end;
+        end;
+      end;
+    end;
   end;
 
   // HUD
@@ -994,6 +1063,88 @@ begin
     loadImage(imgPlayer.Bitmap, NewImage);
     FLastCarImage := NewImage;
   end;
+end;
+
+procedure TfMain.FormTouch(Sender: TObject; const Touches: TTouches; const Action: TTouchAction);
+begin
+  {$IFDEF ANDROID}
+  case action of
+    TTouchAction.Down, TTouchAction.Move: begin
+                                            for var iTouch in Touches do begin
+                                                PressButton(iTouch);
+                                            end;
+                                          end;
+    else begin
+           for var iTouch in Touches do begin
+              if iTouch.action = TTouchAction.Up then ReleaseButton(iTouch);
+           end;
+         end;
+  end;
+  {$ENDIF}
+end;
+
+procedure TfMain.PressButton(iTouch: TTouch);
+begin
+  {$IFDEF ANDROID}
+  if (iTouch.id < 0) or (iTouch.id >= MAXTOUCHPOINTS) then Exit;
+  // Mémoriser l’association doigt/bouton
+  FTouchMap[iTouch.id].Active := true;
+  FTouchMap[iTouch.id].BtnId := detectButtonTouched(iTouch);
+  FTouchMap[iTouch.id].x := iTouch.Location.X;
+  FTouchMap[iTouch.id].y := iTouch.Location.Y;
+
+  // Définir l’état du bouton
+  case FTouchMap[iTouch.id].BtnId of
+    1: FKeyRight := True;
+    2: FKeyLeft := True;
+    3: FKeyUp := True;
+    4: FKeyDown := True;
+  end;
+  {$ENDIF}
+end;
+
+procedure TfMain.ReleaseButton(iTouch: TTouch);
+begin
+  {$IFDEF ANDROID}
+  if (iTouch.id < 0) or (iTouch.id >= MAXTOUCHPOINTS) then Exit;
+  if not(FTouchMap[iTouch.id].Active) then Exit;
+
+  case FTouchMap[iTouch.ID].BtnId of
+    1: FKeyRight := false;
+    2: FKeyLeft := false;
+    3: FKeyUp := false;
+    4: FKeyDown := false;
+  end;
+
+  FTouchMap[iTouch.ID].active := false;
+  {$ENDIF}
+end;
+
+function TfMain.detectButtonTouched(iTouch : TTouch):integer;
+begin
+  {$IFDEF ANDROID}
+  var x := btnRight.Position.x + layIHMMobile.Position.x + layDPad.Position.x + Layout4.Position.x;
+  var y := btnRight.Position.y + layIHMMobile.Position.y + layDPad.Position.y + Layout4.Position.y;
+  if (iTouch.Location.x >= x) and // Si l'utilisateur appuie sur le bouton droit
+     (iTouch.Location.x <= x + btnRight.Width) and (iTouch.Location.y >= y) and (iTouch.Location.y <= (y + btnRight.Height)) then
+    exit(1);
+  x := btnLeft.Position.x + layIHMMobile.Position.x + layDPad.Position.x + Layout2.Position.x;
+  y := btnLeft.Position.y + layIHMMobile.Position.y + layDPad.Position.y + Layout2.Position.y;
+  if (iTouch.Location.x >= x) and // Si l'utilisateur appuie sur le bouton gauche
+     (iTouch.Location.x <= x + btnLeft.Width) and (iTouch.Location.y >= y) and (iTouch.Location.y <= (y + btnLeft.Height)) then
+     exit(2);
+  x := btnAccelerate.Position.x + layIHMMobile.Position.x;
+  y := btnAccelerate.Position.y + layIHMMobile.Position.y;
+  if (iTouch.Location.x >= x) and // Si l'utilisateur appuie sur le bouton de saut
+    (iTouch.Location.x <= (x + btnAccelerate.Width)) and (iTouch.Location.y >= y) and (iTouch.Location.y <= (y + btnAccelerate.Height)) then
+      exit(3);
+  x := btnBrake.Position.x + layIHMMobile.Position.x;
+  y := btnBrake.Position.y + layIHMMobile.Position.y;
+  if (iTouch.Location.x >= x) and // Si l'utilisateur appuie sur le bouton de saut
+    (iTouch.Location.x <= (x + btnBrake.Width)) and (iTouch.Location.y >= y) and (iTouch.Location.y <= (y + btnBrake.Height)) then
+      exit(4);
+  result := 0;
+  {$ENDIF}
 end;
 
 procedure TfMain.tbDrawDistanceChange(Sender: TObject);
