@@ -44,6 +44,7 @@ type
   procedure Project(var Segment: TRoadSegment; CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth: Single);
   procedure drawBackground(anImage: TBitmap; anOffset : integer; aCanvas: TCanvas; FWidth, FHeight : integer);
   procedure drawScanline(aCanvas : TCanvas; FWidth, FHeight : integer);
+  procedure SortOpponentCars(var Cars: TArray<TOpponentCar>);
 
 const
   COLORS: array[0..8] of TAlphaColor = (
@@ -93,10 +94,10 @@ begin
 
   var Polygon : TPolygon;
   SetLength(Polygon, 4);
-  Polygon[0] := PointF(X1, round(prevSegment.Point.Y));
-  Polygon[1] := PointF(X1 + W1, round(prevSegment.Point.Y));
-  Polygon[2] := PointF(X2 + W2, round(segment.Point.Y));
-  Polygon[3] := PointF(X2, round(segment.Point.Y));
+  Polygon[0] := PointF(X1, round(prevSegment.Point.Y)+1);  // + 1 pour être sur de couvrir les éventuel "trous" car point.Y est single
+  Polygon[1] := PointF(X1 + W1, round(prevSegment.Point.Y)+1);
+  Polygon[2] := PointF(X2 + W2, round(segment.Point.Y)+1);
+  Polygon[3] := PointF(X2, round(segment.Point.Y)+1);
 
   aCanvas.Stroke.Kind := TBrushKind.None;
   aCanvas.FillPolygon(Polygon, 1);
@@ -176,6 +177,21 @@ begin
     if i mod 4 = 0 then begin
       aCanvas.FillRect(RectF(0, i, FWidth, i+1), 0, 0, [], 0.5);
     end;
+  end;
+end;
+
+procedure SortOpponentCars(var Cars: TArray<TOpponentCar>);
+begin
+  for var i := 1 to Length(Cars) -1 do begin
+    var Key := Cars[i];
+    var j := i - 1;
+
+    while (j >= 0) and (Cars[j].Position < Key.Position) do begin
+      Cars[j + 1] := Cars[j];
+      Dec(j);
+    end;
+
+    Cars[j + 1] := Key;
   end;
 end;
 

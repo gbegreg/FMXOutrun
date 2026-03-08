@@ -121,15 +121,26 @@ type
     procedure RenderGame(Canvas: TCanvas);
     procedure UpdateGame(const DeltaTime: Single);
     procedure drawPlayerCar;
+    {$IFDEF ANDROID}
     procedure PressButton(iTouch: TTouch);
     procedure ReleaseButton(iTouch: TTouch);
     function detectButtonTouched(iTouch: TTouch): integer;
+    {$ENDIF}
   public
     { Déclarations publiques }
   end;
 
 var
   fMain: TfMain;
+
+const
+  {$IFDEF ANDROID}
+    NBOPPONENTS = 12;
+    DRAWDISTANCE = 100;
+  {$ELSE}
+    NBOPPONENTS = 20;
+    DRAWDISTANCE = 150;
+  {$ENDIF}
 
 implementation
 
@@ -192,7 +203,7 @@ begin
   FCameraHeight := 500;
   FCameraDepth := 1 / Tan((60 / 2) * Pi / 180);
   FFieldOfView := 100;
-  FDrawDistance := 150;
+  FDrawDistance := DRAWDISTANCE;
 
   // Configuration route
   FRoadWidth := 1000;
@@ -234,7 +245,7 @@ begin
   loadImage(FTreeImage, 'tree');
   loadImage(FTree2Image, 'tree2');
   loadImage(FSign1Image, 'sign3');
-  loadImage(FSign2Image, 'sign4');
+  loadImage(FSign2Image, 'sign2');
   loadImage(FSign3Image, 'sign5');
   loadImage(FLeftImage, 'left');
   loadImage(FRightImage, 'right');
@@ -504,7 +515,7 @@ end;
 procedure TfMain.InitializeOpponents;
 begin
   // Créer quelques voitures adverses réparties sur la piste
-  SetLength(FOpponentCars,  20);  // 20 voitures adverses
+  SetLength(FOpponentCars,  NBOPPONENTS);  // 20 voitures adverses sur PC, 12 sur Android
   randomize;
 
   for var i := 0 to High(FOpponentCars) do begin
@@ -556,30 +567,109 @@ begin
     var SegmentIndex := FindSegment(FOpponentCars[i].Position);
     var OpponentSegment := FRoadSegments[SegmentIndex];
 
-    // Changements de voie aléatoires (pour rendre ça vivant)
-    FOpponentCars[i].LaneChangeTimer := FOpponentCars[i].LaneChangeTimer - DeltaTime;
+    // Dépassement - Détecter les adversaires devant
+    var IsBlocked := False;
+    var NeedToOvertake := False;
+    var OvertakeDirection := 0.0;  // -1 = gauche, +1 = droite
 
-    if FOpponentCars[i].LaneChangeTimer <= 0 then begin
-      // Choisir une nouvelle position cible aléatoire
-      FOpponentCars[i].TargetX := (Random * 1.8) - 0.9;  // Entre -0.9 et 0.9
-      FOpponentCars[i].LaneChangeTimer := 3.0 + Random * 4.0;  // Nouveau timer 3-7 sec
+    for var j := 0 to High(FOpponentCars) do begin
+      if i <> j then begin
+        var RelativeZ := FOpponentCars[i].Position - FOpponentCars[j].Position;
+
+        // Gérer le bouclage
+        if RelativeZ < -FTrackLength * 0.5 then
+          RelativeZ := RelativeZ + FTrackLength
+        else if RelativeZ > FTrackLength * 0.5 then
+          RelativeZ := RelativeZ - FTrackLength;
+
+        // Si adversaire devant dans une distance de 1000 unités
+        if (RelativeZ > 0) and (RelativeZ < 1000) then begin
+          var LateralDistance := Abs(FOpponentCars[i].X - FOpponentCars[j].X);
+
+          // Si sur la même voie (distance latérale < 0.35)
+          if LateralDistance < 0.35 then begin
+            IsBlocked := True;
+
+            // Si on va plus vite que lui, on doit doubler
+            if FOpponentCars[i].Speed > FOpponentCars[j].Speed + 50 then begin
+              NeedToOvertake := True;
+
+              // Décider de quel côté doubler
+              // Priorité : doubler du côté qui a le plus d'espace
+              var SpaceLeft := Abs(FOpponentCars[j].X - (-1.0));   // Espace vers la gauche
+              var SpaceRight := Abs(FOpponentCars[j].X - 1.0);     // Espace vers la droite
+
+              OvertakeDirection := if SpaceLeft > SpaceRight then -1.0  // Doubler à gauche
+                                                             else 1.0;  // Doubler à droite
+
+              // Si l'adversaire est déjà sur un bord, doubler de l'autre côté
+              if FOpponentCars[j].X < -0.5 then
+                OvertakeDirection := 1.0   // Il est à gauche, doubler à droite
+              else if FOpponentCars[j].X > 0.5 then
+                OvertakeDirection := -1.0;  // Il est à droite, doubler à gauche
+            end
+            else begin
+              // Si on ne va pas plus vite, ralentir et suivre
+              FOpponentCars[i].Speed := if FOpponentCars[i].Speed > FOpponentCars[j].Speed then FOpponentCars[i].Speed * 0.9 else FOpponentCars[j].Speed;
+            end;
+          end;
+
+          // Si adversaire très proche devant (< 500) sur n'importe quelle voie, éviter
+          if (RelativeZ < 500) and (LateralDistance < 0.5) then begin
+            // Ralentir d'urgence
+            FOpponentCars[i].Speed := FOpponentCars[j].Speed;// * 0.1;
+          end;
+        end;
+      end;
     end;
 
-    // Aller progressivement vers la position cible
-    var DiffX := FOpponentCars[i].TargetX - FOpponentCars[i].X;
-    if Abs(DiffX) > 0.01 then
-      FOpponentCars[i].X := FOpponentCars[i].X + (DiffX * DeltaTime * 0.5);  // Déplacement doux
+    // Dépassement
+    if NeedToOvertake then begin
+      // Position cible pour le dépassement
+      var CurrentLane := FOpponentCars[i].X;
+
+      FOpponentCars[i].TargetX := if OvertakeDirection < 0 then  CurrentLane - 0.8  // Doubler à gauche
+                                                           else  CurrentLane + 0.8; // Doubler à droite
+
+      // Déplacement rapide pour doubler
+      var DiffX := FOpponentCars[i].TargetX - FOpponentCars[i].X;
+      if Abs(DiffX) > 0.01 then
+        FOpponentCars[i].X := FOpponentCars[i].X + (DiffX * DeltaTime * 1.5);  // Plus rapide pendant le dépassement
+    end else begin
+      if not IsBlocked then begin
+      // Changements de voie aléatoires (pour rendre ça vivant)
+      FOpponentCars[i].LaneChangeTimer := FOpponentCars[i].LaneChangeTimer - DeltaTime;
+
+      if FOpponentCars[i].LaneChangeTimer <= 0 then begin
+        // Choisir une nouvelle position cible aléatoire
+        FOpponentCars[i].TargetX := (Random * 1.8) - 0.9;  // Entre -0.9 et 0.9
+        FOpponentCars[i].LaneChangeTimer := 3.0 + Random * 4.0;  // Nouveau timer 3-7 sec
+      end;
+
+      // Aller progressivement vers la position cible
+      var DiffX := FOpponentCars[i].TargetX - FOpponentCars[i].X;
+      if Abs(DiffX) > 0.01 then
+        FOpponentCars[i].X := FOpponentCars[i].X + (DiffX * DeltaTime * 0.5);  // Déplacement doux
+      end
+    end;
 
     // Éviter de sortir de la route
     if FOpponentCars[i].X < -1.3 then begin
       FOpponentCars[i].X := -1.3;
-      FOpponentCars[i].TargetX := 0;  // Revenir au centre
-      FOpponentCars[i].Speed := FOpponentCars[i].Speed * 0.9;  // Ralentir
+      FOpponentCars[i].TargetX := -0.5;  // Revenir vers l'intérieur
+      FOpponentCars[i].Speed := FOpponentCars[i].Speed * 0.85;  // Ralentir
     end else if FOpponentCars[i].X > 1.3 then begin
       FOpponentCars[i].X := 1.3;
-      FOpponentCars[i].TargetX := 0;
-      FOpponentCars[i].Speed := FOpponentCars[i].Speed * 0.9;
+      FOpponentCars[i].TargetX := 0.5;
+      FOpponentCars[i].Speed := FOpponentCars[i].Speed * 0.85;
     end;
+
+    // Récupération progressive de la vitesse de base de l'opposant
+    if FOpponentCars[i].Speed < FOpponentCars[i].BaseSpeed then
+      FOpponentCars[i].Speed := FOpponentCars[i].Speed + (DeltaTime * FAccel * 0.5);
+
+    if FOpponentCars[i].Speed > FOpponentCars[i].BaseSpeed then
+      FOpponentCars[i].Speed := FOpponentCars[i].BaseSpeed;
   end;
 end;
 
@@ -939,6 +1029,7 @@ begin
 
       // 2. Voitures de ce segment
       if FShowOpponents then begin
+        SortOpponentCars(FOpponentCars);
         for var OpIdx := 0 to High(FOpponentCars) do begin
           var OpponentSegmentIndex := FindSegment(FOpponentCars[OpIdx].Position);
 
@@ -1083,9 +1174,9 @@ begin
   {$ENDIF}
 end;
 
+{$IFDEF ANDROID}
 procedure TfMain.PressButton(iTouch: TTouch);
 begin
-  {$IFDEF ANDROID}
   if (iTouch.id < 0) or (iTouch.id >= MAXTOUCHPOINTS) then Exit;
   // Mémoriser l’association doigt/bouton
   FTouchMap[iTouch.id].Active := true;
@@ -1100,12 +1191,13 @@ begin
     3: FKeyUp := True;
     4: FKeyDown := True;
   end;
-  {$ENDIF}
 end;
+{$ENDIF}
 
+{$IFDEF ANDROID}
 procedure TfMain.ReleaseButton(iTouch: TTouch);
 begin
-  {$IFDEF ANDROID}
+
   if (iTouch.id < 0) or (iTouch.id >= MAXTOUCHPOINTS) then Exit;
   if not(FTouchMap[iTouch.id].Active) then Exit;
 
@@ -1117,12 +1209,12 @@ begin
   end;
 
   FTouchMap[iTouch.ID].active := false;
-  {$ENDIF}
 end;
+{$ENDIF}
 
+{$IFDEF ANDROID}
 function TfMain.detectButtonTouched(iTouch : TTouch):integer;
 begin
-  {$IFDEF ANDROID}
   var x := btnRight.Position.x + layIHMMobile.Position.x + layDPad.Position.x + Layout4.Position.x;
   var y := btnRight.Position.y + layIHMMobile.Position.y + layDPad.Position.y + Layout4.Position.y;
   if (iTouch.Location.x >= x) and // Si l'utilisateur appuie sur le bouton droit
@@ -1144,8 +1236,8 @@ begin
     (iTouch.Location.x <= (x + btnBrake.Width)) and (iTouch.Location.y >= y) and (iTouch.Location.y <= (y + btnBrake.Height)) then
       exit(4);
   result := 0;
-  {$ENDIF}
 end;
+{$ENDIF}
 
 procedure TfMain.tbDrawDistanceChange(Sender: TObject);
 begin

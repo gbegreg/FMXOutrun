@@ -5,11 +5,10 @@
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Android64</Platform>
         <TargetedPlatforms>693395</TargetedPlatforms>
         <AppType>Application</AppType>
         <MainSource>FMXOutrun.dpr</MainSource>
-        <ProjectName Condition="'$(ProjectName)'==''">FMXOutrun</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -377,10 +376,6 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>sign3</ResourceId>
         </RcItem>
-        <RcItem Include="img\sign4.png">
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>sign4</ResourceId>
-        </RcItem>
         <RcItem Include="img\sign5.png">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>sign5</ResourceId>
@@ -408,6 +403,10 @@
         <RcItem Include="img\background3.png">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>background3</ResourceId>
+        </RcItem>
+        <RcItem Include="img\sign2.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>sign2</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -1398,6 +1397,18 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="img\sign2.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Android64">
+                        <RemoteDir>.\assets\internal\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="img\sign2.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win64">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="img\sign3.png" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Android64">
                         <RemoteDir>.\assets\internal\</RemoteDir>
@@ -1447,12 +1458,6 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="img\sign4.png" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Android64">
-                        <RemoteDir>.\assets\internal\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="img\sign4.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Linux64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
@@ -1460,12 +1465,6 @@
                 </DeployFile>
                 <DeployFile LocalName="img\sign4.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="img\sign4.png" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win64">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
