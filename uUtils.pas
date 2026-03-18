@@ -20,10 +20,9 @@ type
   TRoadSegment = record
     Index: Integer;
     Point: TPointF;      // Position projetée à l'écran
-    World: TPointF;      // Position dans le monde (X, Z)
+    World: TPoint3D;
     Scale: Single;       // Échelle de projection
     Curve: Single;       // Courbure
-    Y: Single;           // Hauteur (collines)
     Clip: Single;        // Hauteur de clipping à l'écran
   end;
 
@@ -94,7 +93,7 @@ begin
 
   var Polygon : TPolygon;
   SetLength(Polygon, 4);
-  Polygon[0] := PointF(X1, round(prevSegment.Point.Y)+1);  // + 1 pour être sur de couvrir les éventuel "trous" car point.Y est single
+  Polygon[0] := PointF(X1, round(prevSegment.Point.Y)+1);  // + 1 pour être sur de couvrir les éventuels "trous" car point.Y est single
   Polygon[1] := PointF(X1 + W1, round(prevSegment.Point.Y)+1);
   Polygon[2] := PointF(X2 + W2, round(segment.Point.Y)+1);
   Polygon[3] := PointF(X2, round(segment.Point.Y)+1);
@@ -132,18 +131,23 @@ end;
 
 procedure Project(var Segment: TRoadSegment; CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth: Single);
 begin
-  var PosX := Segment.World.X - CamX;
-  var PosY := Segment.Y - CamY;
-  var PosZ := Segment.World.Y - CamZ;
+  // Calcul des positions relatives à la caméra
+  var PosX := Segment.World.X - CamX;  // Distance latérale
+  var PosY := Segment.world.Y - CamY;        // Différence d'altitude
+  var PosZ := Segment.World.Z - CamZ;  // Distance en profondeur
 
+  // Test de visibilité
   if PosZ <= FCameraDepth then begin
-    Segment.Scale := 0;
+    Segment.Scale := 0;  // Objet derrière ou trop proche de la caméra
     Exit;
   end;
 
+  // Calcul de l'échelle (effet de perspective)
   Segment.Scale := FCameraDepth / PosZ;
+  // Projection sur l'écran
   Segment.Point.X := FWidth * 0.5 + (Segment.Scale * PosX * FWidth * 0.5);
   Segment.Point.Y := FHeight * 0.5 - (Segment.Scale * PosY * FHeight * 0.5);
+  // Mémorisation du clipping
   Segment.Clip := Segment.Point.Y;
 end;
 

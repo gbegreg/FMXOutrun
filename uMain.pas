@@ -74,8 +74,7 @@ type
     { Déclarations privées }
     // Configuration
     FWidth, FHeight, FDrawDistance, FRumbleLength: Integer;
-    FCameraHeight, FCameraDepth, FFieldOfView,
-    FRoadWidth, FSegmentLength: Single;
+    FCameraHeight, FCameraDepth, FRoadWidth, FSegmentLength: Single;
 
     // État du jeu
     FPosition, FPlayerX, FPlayerWorldX, FSpeed,
@@ -202,7 +201,6 @@ begin
   // Configuration caméra
   FCameraHeight := 500;
   FCameraDepth := 1 / Tan((60 / 2) * Pi / 180);
-  FFieldOfView := 100;
   FDrawDistance := DRAWDISTANCE;
 
   // Configuration route
@@ -415,10 +413,10 @@ begin
     var N := Length(FRoadSegments) - 1;
     FRoadSegments[N].Index := N;
     FRoadSegments[N].World.X := 0;
-    FRoadSegments[N].World.Y := N * FSegmentLength;
+    FRoadSegments[N].World.Z := N * FSegmentLength;
     var T := I / Enter;
     FRoadSegments[N].Curve := Interpolate(0, Curve, T);
-    FRoadSegments[N].Y := Interpolate(0, Y, InterpolationInOutCubic(T));
+    FRoadSegments[N].world.Y := Interpolate(0, Y, InterpolationInOutCubic(T));
   end;
 
   // Segments de sortie
@@ -427,10 +425,10 @@ begin
     var N := Length(FRoadSegments) - 1;
     FRoadSegments[N].Index := N;
     FRoadSegments[N].World.X := 0;
-    FRoadSegments[N].World.Y := N * FSegmentLength;
+    FRoadSegments[N].World.Z := N * FSegmentLength;
     var T := I / Leave;
     FRoadSegments[N].Curve := Interpolate(Curve, 0, T);
-    FRoadSegments[N].Y := Interpolate(Y, 0, InterpolationInOutCubic(T));
+    FRoadSegments[N].world.Y := Interpolate(Y, 0, InterpolationInOutCubic(T));
   end;
 end;
 
@@ -583,7 +581,7 @@ begin
           RelativeZ := RelativeZ - FTrackLength;
 
         // Si adversaire devant dans une distance de 1000 unités
-        if (RelativeZ > 0) and (RelativeZ < 1000) then begin
+        if (RelativeZ > 0) and (RelativeZ < 1500) then begin
           var LateralDistance := Abs(FOpponentCars[i].X - FOpponentCars[j].X);
 
           // Si sur la même voie (distance latérale < 0.35)
@@ -610,14 +608,16 @@ begin
             end
             else begin
               // Si on ne va pas plus vite, ralentir et suivre
-              FOpponentCars[i].Speed := if FOpponentCars[i].Speed > FOpponentCars[j].Speed then FOpponentCars[i].Speed * 0.9 else FOpponentCars[j].Speed;
+              FOpponentCars[i].Speed := if FOpponentCars[i].Speed > FOpponentCars[j].Speed then FOpponentCars[i].Speed * 0.1
+                                                                                           else FOpponentCars[j].Speed;
             end;
           end;
 
           // Si adversaire très proche devant (< 500) sur n'importe quelle voie, éviter
-          if (RelativeZ < 500) and (LateralDistance < 0.5) then begin
+          if (RelativeZ < 800) and (LateralDistance < 0.5) then begin
             // Ralentir d'urgence
-            FOpponentCars[i].Speed := FOpponentCars[j].Speed;// * 0.1;
+            FOpponentCars[i].Speed := if FOpponentCars[i].Speed > FOpponentCars[j].Speed then FOpponentCars[i].Speed * 0.1
+                                                                                         else FOpponentCars[j].Speed;
           end;
         end;
       end;
@@ -715,12 +715,12 @@ begin
   var InterpolatedRoadX := SegmentA.World.X +
                            (SegmentB.World.X - SegmentA.World.X) * OpponentSegmentProgress;
 
-  var InterpolatedRoadY := SegmentA.Y +
-                           (SegmentB.Y - SegmentA.Y) * OpponentSegmentProgress;
+  var InterpolatedRoadY := SegmentA.world.Y +
+                           (SegmentB.world.Y - SegmentA.world.Y) * OpponentSegmentProgress;
 
   var OpponentWorldX := InterpolatedRoadX + (Opponent.X * FRoadWidth);
-  var OpponentWorldZ := SegmentA.World.Y +
-                    (SegmentB.World.Y - SegmentA.World.Y) * OpponentSegmentProgress;
+  var OpponentWorldZ := SegmentA.World.Z +
+                    (SegmentB.World.Z - SegmentA.World.Z) * OpponentSegmentProgress;
 
   var DeltaX := OpponentWorldX - CamX;
   var DeltaY := InterpolatedRoadY - CamY;
@@ -847,11 +847,11 @@ begin
 
   // Position du sprite dans le monde
   var SpriteWorldX := Segment.World.X + (Sprite.Offset * FRoadWidth);
-  var SpriteWorldZ := Segment.World.Y;
+  var SpriteWorldZ := Segment.World.Z;
 
   // Position relative à la caméra
   var DeltaX := SpriteWorldX - CamX;
-  var DeltaY := Segment.Y - CamY;
+  var DeltaY := Segment.world.Y - CamY;
   var DeltaZ := SpriteWorldZ - CamZ;
 
   // Ne pas afficher si derrière la caméra
@@ -896,7 +896,7 @@ begin
   var NextSegment := FRoadSegments[NextSegmentIndex];
 
   // Interpoler la hauteur Y entre le segment actuel et le suivant
-  var InterpolatedY := CurrentSegment.Y + (NextSegment.Y - CurrentSegment.Y) * SegmentProgress;
+  var InterpolatedY := CurrentSegment.world.Y + (NextSegment.world.Y - CurrentSegment.world.Y) * SegmentProgress;
 
   // Horizon dynamique selon la hauteur
   var HorizonY := (FHeight * 0.5) - (InterpolatedY * 0.02);
@@ -913,7 +913,7 @@ begin
     Canvas.FillRect(RectF(0, HorizonY, FWidth, FHeight), 0, 0, [], 1);
   end;
 
-  climb := round(NextSegment.Y - CurrentSegment.Y) > 70;
+  climb := round(NextSegment.world.Y - CurrentSegment.world.Y) > 70;
   drawPlayerCar;
 
   var CamX := FPlayerWorldX;
@@ -933,8 +933,8 @@ begin
     var SegIndex := (BaseSegment + N) mod Length(FRoadSegments);
     ProjectedSegments[N] := FRoadSegments[SegIndex];
 
-    // Ajuster World.Y (position Z) pour gérer le bouclage
-    ProjectedSegments[N].World.Y := (BaseSegment + N) * FSegmentLength;
+    // Ajuster World.Z (position Z) pour gérer le bouclage
+    ProjectedSegments[N].World.Z := (BaseSegment + N) * FSegmentLength;
     Project(ProjectedSegments[N], CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth);
   end;
 
@@ -1156,6 +1156,11 @@ begin
   end;
 end;
 
+procedure TfMain.tbDrawDistanceChange(Sender: TObject);
+begin
+  FDrawDistance := round(tbDrawDistance.value);
+end;
+
 procedure TfMain.FormTouch(Sender: TObject; const Touches: TTouches; const Action: TTouchAction);
 begin
   {$IFDEF ANDROID}
@@ -1238,10 +1243,5 @@ begin
   result := 0;
 end;
 {$ENDIF}
-
-procedure TfMain.tbDrawDistanceChange(Sender: TObject);
-begin
-  FDrawDistance := round(tbDrawDistance.value);
-end;
 
 end.

@@ -5,7 +5,7 @@ object fMain: TfMain
   ClientHeight = 600
   ClientWidth = 800
   Position = ScreenCenter
-  Quality = HighQuality
+  Quality = HighPerformance
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
