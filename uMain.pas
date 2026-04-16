@@ -1,3 +1,8 @@
+{ This project was created by Grégory BERSEGEAY (https://www.gbesoft.fr)
+  This is a project related to an article for the French magazine Programmez!
+  Liceense MIT
+}
+
 unit uMain;
 
 interface
@@ -1008,7 +1013,6 @@ begin
   end;
 
   // dessin des sprites et des voitures adverses par segment : du plus loin au plus proche
-  // ceci pour
   for var N := FDrawDistance downto 1 do begin
     var Segment := ProjectedSegments[N];
     var I := (BaseSegment + N) mod Length(FRoadSegments);

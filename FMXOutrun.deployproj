@@ -9,7 +9,226 @@
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
         <DeviceId Condition="'$(Platform)'=='iOSSimARM64'"/>
     </PropertyGroup>
-    <ItemGroup Condition="'$(Platform)'=='OSX64'"/>
+    <ItemGroup Condition="'$(Platform)'=='WinARM64EC'"/>
+    <ItemGroup Condition="'$(Platform)'=='OSX64'">
+        <DeployFile Include="OSX64\Release\FMXOutrun.info.plist" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunRight.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunRight.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign5.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign5.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\delphi_PROJECTICNS.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\</RemoteDir>
+            <RemoteName>FMXOutrun.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar1.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\FMXOutrun.entitlements" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\..\</RemoteDir>
+            <RemoteName>FMXOutrun.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background1.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunLeft.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunLeft.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\start.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>start.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\left.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>left.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmonteeleft.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmonteeleft.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSX64\Release\FMXOutrun" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>FMXOutrun</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="img\tree.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>tree.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmonteeright.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmonteeright.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\tree2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>tree2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmontee.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmontee.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\right.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>right.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrun.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrun.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+    </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Win32'">
         <DeployFile Include="img\opponentcar2.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>FMXOutrun\</RemoteDir>
@@ -1405,7 +1624,225 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Android'"/>
-    <ItemGroup Condition="'$(Platform)'=='OSXARM64'"/>
+    <ItemGroup Condition="'$(Platform)'=='OSXARM64'">
+        <DeployFile Include="OSXARM64\Release\FMXOutrun.entitlements" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\..\</RemoteDir>
+            <RemoteName>FMXOutrun.entitlements</RemoteName>
+            <DeployClass>ProjectOSXEntitlements</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\delphi_PROJECTICNS.icns" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\</RemoteDir>
+            <RemoteName>FMXOutrun.icns</RemoteName>
+            <DeployClass>ProjectOSXResource</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\right.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>right.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\start.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>start.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\tree.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>tree.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrun.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrun.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Release\FMXOutrun.info.plist" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectOSXInfoPList</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmontee.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmontee.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\left.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>left.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background3.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background3.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunLeft.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunLeft.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\tree2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>tree2.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmonteeright.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmonteeright.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\outrunmonteeleft.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunmonteeleft.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\opponentcar1.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>opponentcar1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="OSXARM64\Release\FMXOutrun" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\MacOS\</RemoteDir>
+            <RemoteName>FMXOutrun</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="img\outrunRight.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>outrunRight.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign5.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>sign5.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\background1.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+    </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Win64'">
         <DeployFile Include="img\background3.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun\</RemoteDir>
@@ -1666,15 +2103,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="img\sign2.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>FMXOutrun\</RemoteDir>
-            <RemoteName>sign2.png</RemoteName>
-            <DeployClass>ProjectFile</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="img\background2.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun\</RemoteDir>
             <RemoteName>background2.png</RemoteName>
@@ -1687,6 +2115,15 @@
         <DeployFile Include="img\background1.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun\</RemoteDir>
             <RemoteName>background1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\sign4.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun\</RemoteDir>
+            <RemoteName>sign4.png</RemoteName>
             <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
