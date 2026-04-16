@@ -928,13 +928,12 @@ begin
   var MaxY : single := FHeight;
 
   SetLength(SegmentClipY, FDrawDistance + 1);
-  for var N := 0 to FDrawDistance do
-    SegmentClipY[N] := FHeight;
 
   // Projection des segments visibles dans un tableau temporaire
   SetLength(ProjectedSegments, FDrawDistance + 1);
 
   for var N := 0 to FDrawDistance do begin
+    SegmentClipY[N] := FHeight;
     var SegIndex := (BaseSegment + N) mod Length(FRoadSegments);
     ProjectedSegments[N] := FRoadSegments[SegIndex];
 
