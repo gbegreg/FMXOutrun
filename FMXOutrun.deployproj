@@ -1388,15 +1388,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="img\tree2.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>FMXOutrun\assets\internal\</RemoteDir>
-            <RemoteName>tree2.png</RemoteName>
-            <DeployClass>ProjectFile</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="img\tree.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>FMXOutrun\assets\internal\</RemoteDir>
             <RemoteName>tree.png</RemoteName>
@@ -1409,6 +1400,15 @@
         <DeployFile Include="img\tree.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun\assets\internal\</RemoteDir>
             <RemoteName>tree.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="img\tree2.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun\assets\internal\</RemoteDir>
+            <RemoteName>tree2.png</RemoteName>
             <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1815,6 +1815,15 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
+        <DeployFile Include="img\background1.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
+            <RemoteName>background1.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="img\outrunRight.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
             <RemoteName>outrunRight.png</RemoteName>
@@ -1827,15 +1836,6 @@
         <DeployFile Include="img\sign5.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
             <RemoteName>sign5.png</RemoteName>
-            <DeployClass>ProjectFile</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="img\background1.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>FMXOutrun.app\Contents\Resources\StartUp\</RemoteDir>
-            <RemoteName>background1.png</RemoteName>
             <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>

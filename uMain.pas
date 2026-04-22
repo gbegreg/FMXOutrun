@@ -83,8 +83,10 @@ type
 
     // État du jeu
     FPosition, FPlayerX, FPlayerWorldX, FSpeed,
-    FMaxSpeed, FAccel, FDecel, FBraking, FCentrifugal: Single;
+    FMaxSpeed, FAccel, FDecel, FBraking, FCentrifugal, FPlayerDistanceInSegment, FPlayerSegmentProgress: Single;
     FLastCarImage: string;
+    FPlayerSegmentIndex, FPlayerNextSegmentIndex : integer;
+    FPlayerSegment, FPlayerNextSegment : TRoadSegment;
 
     // Opions d'affichage
     FShowOpponents, FShowSprites, FShowRumbles,
@@ -125,6 +127,7 @@ type
     procedure RenderGame(Canvas: TCanvas);
     procedure UpdateGame(const DeltaTime: Single);
     procedure drawPlayerCar;
+    procedure findPlayerSegment;
     {$IFDEF ANDROID}
     procedure PressButton(iTouch: TTouch);
     procedure ReleaseButton(iTouch: TTouch);
@@ -138,6 +141,7 @@ var
   fMain: TfMain;
 
 const
+  DELTA_TIME = 1/60;
   {$IFDEF ANDROID}
     NBOPPONENTS = 12;
     DRAWDISTANCE = 100;
@@ -218,7 +222,7 @@ begin
   FPlayerWorldX := 0;
   FPlayerX := 0;
   FSpeed := 0;
-  FMaxSpeed := FSegmentLength / (1/60); // Vitesse max
+  FMaxSpeed := FSegmentLength / (DELTA_TIME); // Vitesse max
   FAccel := FMaxSpeed / 4;
   FDecel := -FMaxSpeed / 6;
   FBraking := -FMaxSpeed;
@@ -888,20 +892,8 @@ begin
   var ProjectedSegments: array of TRoadSegment;
   var SegmentClipY: array of Single;  // Tableau pour stocker le ClipY de chaque segment
 
-  // Position caméra avec interpolation
-  var BaseSegment := FindSegment(FPosition);
-  var CurrentSegment := FRoadSegments[BaseSegment];
-
-  // Calculer la progression dans le segment actuel (0 à 1)
-  var DistanceInSegment := FPosition - (BaseSegment * FSegmentLength);
-  var SegmentProgress := DistanceInSegment / FSegmentLength;
-
-  // Segment suivant
-  var NextSegmentIndex := (BaseSegment + 1) mod Length(FRoadSegments);
-  var NextSegment := FRoadSegments[NextSegmentIndex];
-
   // Interpoler la hauteur Y entre le segment actuel et le suivant
-  var InterpolatedY := CurrentSegment.world.Y + (NextSegment.world.Y - CurrentSegment.world.Y) * SegmentProgress;
+  var InterpolatedY := FPlayerSegment.world.Y + (FPlayerNextSegment.world.Y - FPlayerSegment.world.Y) * FPlayerSegmentProgress;
 
   // Horizon dynamique selon la hauteur
   var HorizonY := (FHeight * 0.5) - (InterpolatedY * 0.02);
@@ -918,7 +910,7 @@ begin
     Canvas.FillRect(RectF(0, HorizonY, FWidth, FHeight), 0, 0, [], 1);
   end;
 
-  climb := round(NextSegment.world.Y - CurrentSegment.world.Y) > 70;
+  climb := round(FPlayerNextSegment.world.Y - FPlayerSegment.world.Y) > 70;
   drawPlayerCar;
 
   var CamX := FPlayerWorldX;
@@ -934,11 +926,11 @@ begin
 
   for var N := 0 to FDrawDistance do begin
     SegmentClipY[N] := FHeight;
-    var SegIndex := (BaseSegment + N) mod Length(FRoadSegments);
+    var SegIndex := (FPlayerSegmentIndex + N) mod Length(FRoadSegments);
     ProjectedSegments[N] := FRoadSegments[SegIndex];
 
     // Ajuster World.Z (position Z) pour gérer le bouclage
-    ProjectedSegments[N].World.Z := (BaseSegment + N) * FSegmentLength;
+    ProjectedSegments[N].World.Z := (FPlayerSegmentIndex + N) * FSegmentLength;
     Project(ProjectedSegments[N], CamX, CamY, CamZ, FWidth, FHeight, FCameraDepth);
   end;
 
@@ -946,7 +938,7 @@ begin
   for var N := 1 to FDrawDistance do begin
     var Segment := ProjectedSegments[N];
     var PrevSegment := ProjectedSegments[N - 1];
-    var I := (BaseSegment + N) mod Length(FRoadSegments);
+    var I := (FPlayerSegmentIndex + N) mod Length(FRoadSegments);
 
     if Segment.Point.Y < MaxY then begin
       MaxY := Segment.Point.Y;
@@ -1014,7 +1006,7 @@ begin
   // dessin des sprites et des voitures adverses par segment : du plus loin au plus proche
   for var N := FDrawDistance downto 1 do begin
     var Segment := ProjectedSegments[N];
-    var I := (BaseSegment + N) mod Length(FRoadSegments);
+    var I := (FPlayerSegmentIndex + N) mod Length(FRoadSegments);
 
     if (Segment.Scale > 0) and (Segment.Point.Y < FHeight) then begin
       var ClipY: Single := FHeight;
@@ -1038,7 +1030,7 @@ begin
 
           if OpponentSegmentIndex = I then begin
             RenderOpponent(Canvas, FOpponentCars[OpIdx], CamX, CamY, CamZ,
-                          ProjectedSegments, BaseSegment, SegmentClipY);
+                          ProjectedSegments, FPlayerSegmentIndex, SegmentClipY);
           end;
         end;
       end;
@@ -1051,8 +1043,24 @@ end;
 
 procedure TfMain.tGameloopTimer(Sender: TObject);
 begin
-  UpdateGame(1/60);
+  findPlayerSegment;
+  UpdateGame(DELTA_TIME);
   PaintBox.Repaint;
+end;
+
+procedure TfMain.findPlayerSegment;
+begin
+  // Trouver le segment actuel du joueur
+  FPlayerSegmentIndex := FindSegment(FPosition);
+  FPlayerSegment := FRoadSegments[FPlayerSegmentIndex];
+
+  // Calculer la progression dans le segment actuel (0 à 1)
+  FPlayerDistanceInSegment := FPosition - (FPlayerSegmentIndex * FSegmentLength);
+  FPlayerSegmentProgress := FPlayerDistanceInSegment / FSegmentLength;
+
+  // Segment suivant
+  FPlayerNextSegmentIndex := (FPlayerSegmentIndex + 1) mod Length(FRoadSegments);
+  FPlayerNextSegment := FRoadSegments[FPlayerNextSegmentIndex];
 end;
 
 procedure TfMain.UpdateGame(const DeltaTime: Single);
@@ -1076,21 +1084,9 @@ begin
   if FPosition >= FTrackLength then
     FPosition := FPosition - FTrackLength;
 
-  // Trouver le segment actuel
-  var SegmentIndex := FindSegment(FPosition);
-  var PlayerSegment := FRoadSegments[SegmentIndex];
-
-  // Calculer la progression dans le segment
-  var DistanceInSegment := FPosition - (SegmentIndex * FSegmentLength);
-  var SegmentProgress := DistanceInSegment / FSegmentLength;
-
-  // Segment suivant
-  var NextSegmentIndex := (SegmentIndex + 1) mod Length(FRoadSegments);
-  var NextPlayerSegment := FRoadSegments[NextSegmentIndex];
-
   // Interpoler la position X du centre de la route
-  var InterpolatedRoadX := PlayerSegment.World.X +
-                       (NextPlayerSegment.World.X - PlayerSegment.World.X) * SegmentProgress;
+  var InterpolatedRoadX := FPlayerSegment.World.X +
+                       (FPlayerNextSegment.World.X - FPlayerSegment.World.X) * FPlayerSegmentProgress;
 
   // Vitesse en pourcentage
   var SpeedPercent := FSpeed / FMaxSpeed;
@@ -1107,11 +1103,11 @@ begin
   FPlayerX := FPlayerX + SteeringInput;
 
   // Effet centrifuge
-  FPlayerX := FPlayerX - (DeltaTime * SpeedPercent * PlayerSegment.Curve * 16.0);
+  FPlayerX := FPlayerX - (DeltaTime * SpeedPercent * FPlayerSegment.Curve * 16.0);
 
   // Mettre à jour le background offset basé sur la courbure et le braquage
   // La courbure de la route fait tourner le background
-  var BackgroundScrollSpeed := -PlayerSegment.Curve * DeltaTime * FSpeed * 0.01;
+  var BackgroundScrollSpeed := -FPlayerSegment.Curve * DeltaTime * FSpeed * 0.01;
   FBackgroundOffset := round(FBackgroundOffset + BackgroundScrollSpeed);
 
   // Détection off-road
