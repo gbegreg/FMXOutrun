@@ -78,7 +78,7 @@ type
   private
     { Déclarations privées }
     // Configuration
-    FWidth, FHeight, FDrawDistance, FRumbleLength: Integer;
+    FWidth, FHeight, FDrawDistance: Integer;
     FCameraHeight, FCameraDepth, FRoadWidth, FSegmentLength: Single;
 
     // État du jeu
@@ -215,7 +215,6 @@ begin
   // Configuration route
   FRoadWidth := 1000;
   FSegmentLength := 500;
-  FRumbleLength := 1;
 
   // Configuration joueur
   FPosition := 0;
@@ -944,7 +943,7 @@ begin
       MaxY := Segment.Point.Y;
       SegmentClipY[N] := MaxY;
 
-      if (I div FRumbleLength) mod 2 = 0 then begin
+      if I mod 2 = 0 then begin
         Grass := COLORS[7];
         Rumble := COLORS[2];
         Rumble2 := COLORS[4];
