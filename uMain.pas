@@ -278,8 +278,6 @@ begin
   InitializeRoad;
   FPlayerWorldX := FRoadSegments[0].World.X;
 
-  InitializeOpponents;
-
   tGameloop.Interval := 16; // ~60 FPS
   tGameloop.Enabled := True;
 end;
@@ -411,6 +409,8 @@ begin
         AddSprite(i, stRight, -1.7);
     end;
   end;
+
+  InitializeOpponents;
 end;
 
 procedure TfMain.AddRoad(Enter, Leave, Curve, Y: Single);
@@ -569,10 +569,6 @@ begin
       FOpponentCars[i].Position := FOpponentCars[i].Position - FTrackLength;
 
     // IA des opposants
-    // Récupérer le segment et calculer position interpolée
-    var SegmentIndex := FindSegment(FOpponentCars[i].Position);
-    var OpponentSegment := FRoadSegments[SegmentIndex];
-
     // Dépassement - Détecter les adversaires devant
     var IsBlocked := False;
     var NeedToOvertake := False;
@@ -588,7 +584,7 @@ begin
         else if RelativeZ > FTrackLength * 0.5 then
           RelativeZ := RelativeZ - FTrackLength;
 
-        // Si adversaire devant dans une distance de 1000 unités
+        // Si adversaire devant dans une distance de 1500 unités
         if (RelativeZ > 0) and (RelativeZ < 1500) then begin
           var LateralDistance := Abs(FOpponentCars[i].X - FOpponentCars[j].X);
 
@@ -597,7 +593,7 @@ begin
             IsBlocked := True;
 
             // Si on va plus vite que lui, on doit doubler
-            if FOpponentCars[i].Speed > FOpponentCars[j].Speed + 50 then begin
+            if FOpponentCars[i].Speed > FOpponentCars[j].Speed + 10 then begin
               NeedToOvertake := True;
 
               // Décider de quel côté doubler
@@ -620,7 +616,6 @@ begin
                                                                                            else FOpponentCars[j].Speed;
             end;
           end;
-
           // Si adversaire très proche devant (< 500) sur n'importe quelle voie, éviter
           if (RelativeZ < 800) and (LateralDistance < 0.5) then begin
             // Ralentir d'urgence
@@ -658,7 +653,7 @@ begin
       var DiffX := FOpponentCars[i].TargetX - FOpponentCars[i].X;
       if Abs(DiffX) > 0.01 then
         FOpponentCars[i].X := FOpponentCars[i].X + (DiffX * DeltaTime * 0.5);  // Déplacement doux
-      end
+      end;
     end;
 
     // Éviter de sortir de la route
