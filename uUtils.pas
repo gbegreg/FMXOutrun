@@ -163,7 +163,7 @@ begin
 
   // Calculer combien de copies on doit dessiner pour remplir l'écran
   var StartX := NormalizedOffset;
-  var NumCopies := Ceil(FWidth / BgWidth) + 2;  // +2 pour être sûr de tout couvrir
+  var NumCopies := Ceil(FWidth / BgWidth) + 1;  // +1 pour être sûr de tout couvrir
 
   for var i := 0 to NumCopies - 1 do begin
     var DestX := StartX + (i * BgWidth);

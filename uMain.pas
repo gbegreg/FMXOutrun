@@ -193,6 +193,7 @@ begin
   {$IFDEF ANDROID}
     FWidth := 640;
     FHeight := 400;
+    Fullscreen := true;
     ClientWidth := FWidth;
     ClientHeight := FHeight;
     layIHMMobile.visible := true;
