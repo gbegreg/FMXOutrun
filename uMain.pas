@@ -1038,8 +1038,8 @@ end;
 
 procedure TfMain.tGameloopTimer(Sender: TObject);
 begin
-  findPlayerSegment;
   UpdateGame(DELTA_TIME);
+  findPlayerSegment;
   PaintBox.Repaint;
 end;
 
@@ -1103,7 +1103,10 @@ begin
   // Mettre à jour le background offset basé sur la courbure et le braquage
   // La courbure de la route fait tourner le background
   var BackgroundScrollSpeed := -FPlayerSegment.Curve * DeltaTime * FSpeed * 0.01;
-  FBackgroundOffset := round(FBackgroundOffset + BackgroundScrollSpeed);
+//  FBackgroundOffset := round(FBackgroundOffset + BackgroundScrollSpeed);
+  if FBackgroundOffset < 0 then
+    FBackgroundOffset := FBackgroundOffset + FBackgroundImages[0].Width;
+  FBackgroundOffset := FBackgroundOffset mod FBackgroundImages[0].Width;
 
   // Détection off-road
   if (FPlayerX < -1.2) or (FPlayerX > 1.2) then begin
