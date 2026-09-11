@@ -8,7 +8,7 @@
 
 A 2D race car like Outrun with Delphi  <br /><br />
 
-This project is linked to an article that will be published in Programmez! magazine in a 100% gamedev dossier.(french). <br />
+This project is linked to an article that will be published in [Programmez!](https://www.programmez.com/magazine/article/course-de-voitures) magazine in a 100% gamedev dossier.(french). <br />
 It allows you to create a 2D racing video game in the style of Outrun or Lotus Turbo Challenge.<br />
 It's been exactly 40 years since Sega released its Outrun arcade machine!<br /><br />
 
